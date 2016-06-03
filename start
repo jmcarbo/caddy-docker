@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -z $CADDYFILE ];
+if [ -n "$CADDYFILE" ];
 then
 	echo "$CADDYFILE" >/etc/Caddyfile
 fi
