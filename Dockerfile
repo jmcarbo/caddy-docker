@@ -18,7 +18,10 @@ WORKDIR /srv
 
 ADD Caddyfile /etc/Caddyfile
 ADD index.html /srv/index.html
+ADD start /start
 
-ENTRYPOINT ["/usr/bin/caddy"]
+RUN chmod +x /start
+
+ENTRYPOINT ["/start"]
 CMD ["--conf", "/etc/Caddyfile"]
 
