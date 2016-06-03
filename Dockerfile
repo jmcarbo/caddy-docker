@@ -18,7 +18,7 @@ WORKDIR /srv
 
 ADD Caddyfile /etc/Caddyfile
 ADD index.html /srv/index.html
-ADD start /start
+COPY start /start
 
 RUN chmod +x /start
 
