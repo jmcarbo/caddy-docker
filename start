@@ -5,4 +5,4 @@ then
 	echo "$CADDYFILE" >/etc/Caddyfile
 fi
 
-/usr/bin/caddy "$@"
+/go/bin/caddy "$@"
