@@ -3,7 +3,7 @@ MAINTAINER Abiola Ibrahim <abiola89@gmail.com>
 
 LABEL caddy_version="0.8.3" architecture="amd64"
 
-RUN apk add --update openssh-client git tar
+RUN apt-get update && apt-get install -y openssh-client git
 
 RUN go get github.com/mholt/caddy/caddy
 
