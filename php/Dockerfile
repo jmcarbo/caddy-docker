@@ -3,7 +3,8 @@ MAINTAINER Abiola Ibrahim <abiola89@gmail.com>
 
 LABEL caddy_version="0.9.5" architecture="amd64"
 
-ARG plugins=git
+#ARG plugins=git
+ARG plugins="awslambda,cors,expires,filter,git,filemanager,hugo,ipfilter,jsonp,jwt,locale,mailout,minify,multipass,prometheus,ratelimit,realip,search,upload"
 
 RUN apk add --no-cache openssh-client git tar php7-fpm curl
 
