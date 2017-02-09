@@ -1,22 +1,26 @@
-FROM golang
+FROM alpine:3.5
 MAINTAINER Abiola Ibrahim <abiola89@gmail.com>
 
-LABEL caddy_version="0.8.3" architecture="amd64"
+LABEL caddy_version="0.9.5" architecture="amd64"
 
-RUN apt-get update && apt-get install -y openssh-client git
+#ARG plugins=git
+ARG plugins="awslambda,cors,expires,filter,git,filemanager,hugo,ipfilter,jsonp,jwt,locale,mailout,minify,multipass,prometheus,ratelimit,realip,search,upload"
 
-RUN go get github.com/mholt/caddy/caddy
+RUN apk add --no-cache openssh-client git tar curl
+
+RUN curl --silent --show-error --fail --location \
+      --header "Accept: application/tar+gzip, application/x-gzip, application/octet-stream" -o - \
+      "https://caddyserver.com/download/build?os=linux&arch=amd64&features=${plugins}" \
+    | tar --no-same-owner -C /usr/bin/ -xz caddy \
+ && chmod 0755 /usr/bin/caddy \
+ && /usr/bin/caddy -version
 
 EXPOSE 80 443 2015
-VOLUME /srv
+VOLUME /root/.caddy
 WORKDIR /srv
 
-ADD Caddyfile /etc/Caddyfile
-ADD index.html /srv/index.html
-COPY start /start
+COPY Caddyfile /etc/Caddyfile
+COPY index.html /srv/index.html
 
-RUN chmod +x /start
-
-ENTRYPOINT ["/start"]
-CMD ["--conf", "/etc/Caddyfile"]
-
+ENTRYPOINT ["/usr/bin/caddy"]
+CMD ["--conf", "/etc/Caddyfile", "--log", "stdout"]

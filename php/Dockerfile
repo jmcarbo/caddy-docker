@@ -1,29 +1,37 @@
-FROM alpine:3.2
+FROM alpine:3.5
 MAINTAINER Abiola Ibrahim <abiola89@gmail.com>
 
-LABEL caddy_version="0.8.3" architecture="amd64"
+LABEL caddy_version="0.9.5" architecture="amd64"
 
-RUN apk add --update openssh-client git tar php-fpm
+ARG plugins=git
+
+RUN apk add --no-cache openssh-client git tar php7-fpm curl
 
 # essential php libs
-RUN apk add php-curl php-gd php-zip php-iconv php-sqlite3 php-mysql php-mysqli php-json
+RUN apk add --no-cache php7-curl php7-dom php7-gd php7-ctype php7-zip php7-xml php7-iconv php7-sqlite3 php7-mysqli php7-pgsql php7-json php7-phar php7-openssl php7-pdo
+
+# composer
+RUN curl --silent --show-error --fail --location \
+      --header "Accept: application/tar+gzip, application/x-gzip, application/octet-stream" \
+      "https://getcomposer.org/installer" \
+    | php7 -- --install-dir=/usr/bin --filename=composer
 
 # allow environment variable access.
-RUN echo "clear_env = no" >> /etc/php/php-fpm.conf
+RUN echo "clear_env = no" >> /etc/php7/php-fpm.conf
 
+# install caddy
 RUN curl --silent --show-error --fail --location \
       --header "Accept: application/tar+gzip, application/x-gzip, application/octet-stream" -o - \
-      "https://caddyserver.com/download/build?os=linux&arch=amd64&features=git" \
+      "https://caddyserver.com/download/build?os=linux&arch=amd64&features=${plugins}" \
     | tar --no-same-owner -C /usr/bin/ -xz caddy \
- && chmod 0755 /usr/bin/caddy \
+ && chmod 0755 /usr/bin/caddy \  
  && /usr/bin/caddy -version
 
 EXPOSE 80 443 2015
-VOLUME /srv
 WORKDIR /srv
 
-ADD Caddyfile /etc/Caddyfile
-ADD index.php /srv/index.php
+COPY Caddyfile /etc/Caddyfile
+COPY index.php /srv/index.php
 
 ENTRYPOINT ["/usr/bin/caddy"]
-CMD ["--conf", "/etc/Caddyfile"]
+CMD ["--conf", "/etc/Caddyfile", "--log", "stdout"]
