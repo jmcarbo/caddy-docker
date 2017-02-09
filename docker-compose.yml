@@ -11,6 +11,14 @@ services:
           filemanager /fm {
             show /bla
           }
+          log / stdout "{combined}"
+          errors stderr
+          search /bla/hugo {
+            datadir /tmp/bla
+            endpoint /mysearch
+          }
+          basicauth /admin foo bar
+          hugo /bla/hugo /admin 
         }
       HELLO_WORLD: |-
         <html>
@@ -22,3 +30,7 @@ services:
       - $PWD:/bla
     ports:
       - "7777:80"
+    logging:
+      driver: journald
+      options:
+        tag: "{{.ImageName}}/{{.Name}}/{{.ID}}"
